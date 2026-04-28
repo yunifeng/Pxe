@@ -80,5 +80,7 @@ if app.debug:
 
 # API 路由前缀
 from app.api import router as api_router  # noqa: E402
+from app.api.auth import auth_router  # noqa: E402
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1/auth")
