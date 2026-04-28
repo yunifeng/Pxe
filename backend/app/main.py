@@ -66,14 +66,16 @@ async def root():
     }
 
 
-@app.get("/api/v1/test-raise-exception")
-async def test_raise_exception():
-    """测试端点 - 触发 PxeException"""
-    raise PxeException(
-        code="TEST_ERROR",
-        message="这是一个测试异常",
-        status_code=400,
-    )
+if app.debug:
+
+    @app.get("/api/v1/test-raise-exception")
+    async def test_raise_exception():
+        """测试端点 - 触发 PxeException (仅 debug 模式)"""
+        raise PxeException(
+            code="TEST_ERROR",
+            message="这是一个测试异常",
+            status_code=400,
+        )
 
 
 # API 路由前缀

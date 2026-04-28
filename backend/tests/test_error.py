@@ -1,9 +1,5 @@
 """测试错误处理"""
 import asyncio
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 class TestPxeException:
@@ -29,18 +25,23 @@ class TestErrorHandlers:
 
     def test_pxe_exception_handler(self):
         """测试 PxeException 异常处理器返回格式"""
-        from app.main import app
-        from httpx import AsyncClient, ASGITransport
+        from app.exceptions import PxeException, pxe_exception_handler
 
         async def _run():
-            transport = ASGITransport(app=app)
-            async with AsyncClient(transport=transport, base_url="http://test") as client:
-                response = await client.get("/api/v1/test-raise-exception")
-                assert response.status_code == 400
-                data = response.json()
-                assert data["success"] is False
-                assert data["error"]["code"] == "TEST_ERROR"
-                assert "测试异常" in data["error"]["message"]
+            exc = PxeException(
+                code="TEST_ERROR",
+                message="这是一个测试异常",
+                status_code=400,
+            )
+            response = await pxe_exception_handler(None, exc)
+            assert response.status_code == 400
+            data = response.body
+            import json
+
+            data = json.loads(data)
+            assert data["success"] is False
+            assert data["error"]["code"] == "TEST_ERROR"
+            assert "测试异常" in data["error"]["message"]
 
         asyncio.run(_run())
 
