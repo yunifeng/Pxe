@@ -3,10 +3,19 @@
 提供密码哈希 (bcrypt) 和对称加密 (Fernet) 功能
 """
 import os
+import sys
+from types import ModuleType
 from typing import Optional
 
+import bcrypt
 from cryptography.fernet import Fernet, InvalidToken
 from passlib.context import CryptContext
+
+# 修复 passlib 1.7.4 和 bcrypt 4.x 的兼容性问题
+if not hasattr(bcrypt, "__about__"):
+    about = ModuleType("bcrypt.__about__")
+    about.__version__ = bcrypt.__version__
+    bcrypt.__about__ = about
 
 from app.config import settings
 

@@ -2,6 +2,7 @@
 数据库模块
 SQLite 引擎、会话工厂、依赖注入
 """
+import os
 from typing import Generator
 
 from sqlalchemy import create_engine, text
@@ -9,6 +10,14 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import settings
 
+
+# 确保数据库目录存在
+try:
+    db_dir = os.path.dirname(settings.db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+except PermissionError:
+    pass
 
 # 数据库 URL
 DATABASE_URL = "sqlite:///" + settings.db_path
