@@ -165,9 +165,9 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=${INSTALL_DIR}
+WorkingDirectory=${INSTALL_DIR}/backend
 EnvironmentFile=${INSTALL_DIR}/.env
-ExecStart=${venv}/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+ExecStart=${venv}/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 Restart=on-failure
 RestartSec=5
 StandardOutput=append:${LOG_DIR}/backend.log
@@ -278,9 +278,10 @@ init_database() {
     set -a && source "${INSTALL_DIR}/.env" && set +a
 
     cd "${INSTALL_DIR}"
+    cd "${INSTALL_DIR}/backend"
     "${venv}/bin/python3" -c "
 import sys
-sys.path.insert(0, '${PROJECT_DIR}/backend')
+sys.path.insert(0, '.')
 from app.database import Base, SessionLocal, engine
 from app.models import User, Node
 from app.config import settings

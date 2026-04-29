@@ -67,6 +67,12 @@ async def root():
     }
 
 
+@app.get("/api/v1/health")
+async def health():
+    """健康检查端点"""
+    return {"status": "ok"}
+
+
 if app.debug:
 
     @app.get("/api/v1/test-raise-exception")
