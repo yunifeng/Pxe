@@ -43,10 +43,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS 中间件 (允许前端访问)
+# CORS 中间件 (允许所有来源 - 部署环境为内部网络)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
