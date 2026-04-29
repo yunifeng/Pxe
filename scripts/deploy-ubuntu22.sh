@@ -79,14 +79,8 @@ install_dependencies() {
         "${venv}/bin/pip" install -r "${PROJECT_DIR}/backend/requirements.txt" > /dev/null 2>&1
     fi
 
-    # Frontend build
-    if [[ -d "${PROJECT_DIR}/frontend" && -f "${PROJECT_DIR}/frontend/package.json" ]]; then
-        info "Building frontend..."
-        cd "${PROJECT_DIR}/frontend"
-        npm install --silent > /dev/null 2>&1
-        npm run build > /dev/null 2>&1
-        cd - > /dev/null
-    fi
+    # Frontend build (after rsync to install dir)
+    # NOTE: this is called after create_directories copies source files
 
     info "Dependencies installed"
 }
@@ -112,6 +106,15 @@ create_directories() {
         rsync -a --exclude='node_modules' --exclude='dist' \
             --exclude='.git' --exclude='.venv' \
             "${PROJECT_DIR}/" "${INSTALL_DIR}/"
+    fi
+
+    # Build frontend in install directory
+    if [[ -f "${INSTALL_DIR}/frontend/package.json" ]]; then
+        info "Building frontend..."
+        cd "${INSTALL_DIR}/frontend"
+        npm install --silent > /dev/null 2>&1
+        npm run build > /dev/null 2>&1
+        cd - > /dev/null
     fi
 
     info "Directories created"
@@ -155,7 +158,7 @@ install_systemd_services() {
     info "Installing systemd services..."
 
     local venv="${INSTALL_DIR}/.venv"
-    local frontend_dist="${PROJECT_DIR}/frontend/dist"
+    local frontend_dist="${INSTALL_DIR}/frontend/dist"
 
     # Backend service
     cat > /etc/systemd/system/pxe-backend.service <<EOF
