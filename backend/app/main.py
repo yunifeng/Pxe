@@ -7,6 +7,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.routing import WebSocketRoute
 
 from app.config import settings
 from app.database import init_db
@@ -81,6 +82,28 @@ if app.debug:
 # API 路由前缀
 from app.api import router as api_router  # noqa: E402
 from app.api.auth import auth_router  # noqa: E402
+from app.api.pxe import pxe_router  # noqa: E402
+from app.api.bmc import bmc_router  # noqa: E402
+from app.api.node import node_router  # noqa: E402
+from app.api.host import host_router  # noqa: E402
+from app.api.filemgr import filemgr_router  # noqa: E402
+from app.api.template import template_router  # noqa: E402
+from app.api.dashboard import dashboard_router  # noqa: E402
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1/auth")
+app.include_router(pxe_router, prefix="/api/v1/pxe")
+app.include_router(bmc_router, prefix="/api/v1/bmc")
+app.include_router(node_router, prefix="/api/v1/node")
+app.include_router(host_router, prefix="/api/v1/host")
+app.include_router(filemgr_router, prefix="/api/v1/file")
+app.include_router(template_router, prefix="/api/v1/template")
+app.include_router(dashboard_router, prefix="/api/v1/dashboard")
+
+# WebSocket 实时通信端点
+from app.ws import ws_endpoint, ws_tasks, ws_bmc, ws_services  # noqa: E402
+
+app.routes.append(WebSocketRoute("/ws", ws_endpoint))
+app.routes.append(WebSocketRoute("/ws/tasks", ws_tasks))
+app.routes.append(WebSocketRoute("/ws/bmc", ws_bmc))
+app.routes.append(WebSocketRoute("/ws/services", ws_services))
