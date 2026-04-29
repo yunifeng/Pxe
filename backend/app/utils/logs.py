@@ -48,23 +48,23 @@ def setup_logging(
 
     # 文件处理器 (生产模式)
     if enable_file:
-        # 确保日志目录存在
-        log_dir = settings.log_dir
-        os.makedirs(log_dir, exist_ok=True)
-
-        log_file = os.path.join(log_dir, "pxe.log")
-        file_handler = TimedRotatingFileHandler(
-            filename=log_file,
-            when="midnight",  # 每天午夜轮转
-            interval=1,       # 每 1 天
-            backupCount=30,   # 保留 30 天
-            encoding="utf-8",
-        )
-        file_handler.setLevel(level)
-        file_handler.setFormatter(formatter)
-        # 设置文件名后缀格式
-        file_handler.suffix = "%Y-%m-%d.log"
-        logger.addHandler(file_handler)
+        try:
+            log_dir = settings.log_dir
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, "pxe.log")
+            file_handler = TimedRotatingFileHandler(
+                filename=log_file,
+                when="midnight",
+                interval=1,
+                backupCount=30,
+                encoding="utf-8",
+            )
+            file_handler.setLevel(level)
+            file_handler.setFormatter(formatter)
+            file_handler.suffix = "%Y-%m-%d.log"
+            logger.addHandler(file_handler)
+        except PermissionError:
+            pass
 
     return logger
 

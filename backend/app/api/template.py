@@ -68,7 +68,7 @@ def update_template(
     current_user: dict = Depends(require_role(Role.ADMIN)),
 ):
     """更新模板"""
-    updates = {k: v for k, v in req.dict().items() if v is not None}
+    updates = {k: v for k, v in req.model_dump().items() if v is not None}
     tmpl = preseed.update_template(template_id, **updates)
     return {"success": True, "data": tmpl}
 

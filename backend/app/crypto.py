@@ -18,21 +18,23 @@ _fernet: Optional[Fernet] = None
 
 
 def _get_fernet() -> Fernet:
-    """获取 Fernet 加密实例"""
+    """获取 Fernet 加密实例，无法写入密钥文件时退化为内存密钥"""
     global _fernet
     if _fernet is None:
         key_path = settings.fernet_key_path
-        key_dir = os.path.dirname(key_path)
-        if key_dir:
-            os.makedirs(key_dir, exist_ok=True)
-
-        if os.path.exists(key_path):
-            with open(key_path, "rb") as f:
-                key = f.read()
-        else:
+        try:
+            key_dir = os.path.dirname(key_path)
+            if key_dir:
+                os.makedirs(key_dir, exist_ok=True)
+            if os.path.exists(key_path):
+                with open(key_path, "rb") as f:
+                    key = f.read()
+            else:
+                key = Fernet.generate_key()
+                with open(key_path, "wb") as f:
+                    f.write(key)
+        except PermissionError:
             key = Fernet.generate_key()
-            with open(key_path, "wb") as f:
-                f.write(key)
         _fernet = Fernet(key)
     return _fernet
 
